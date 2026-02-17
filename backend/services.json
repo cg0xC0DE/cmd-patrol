@@ -1,0 +1,98 @@
+[
+  {
+    "id": "42df4467-d225-4b66-ac8f-ad25780a9cfa",
+    "name": "nginx_restart",
+    "script_path": "C:\\workplace\\config\\nginx_restart.cmd",
+    "cwd": "C:\\workplace\\config",
+    "command": "cmd.exe /c \"C:\\workplace\\config\\nginx_restart.cmd\"",
+    "port": ""
+  },
+  {
+    "id": "0a2b0b4d-7555-4418-b1ce-85fce515e57b",
+    "name": "ngrok_start",
+    "script_path": "C:\\workplace\\config\\ngrok_start.cmd",
+    "cwd": "C:\\workplace\\config",
+    "command": "cmd.exe /c \"C:\\workplace\\config\\ngrok_start.cmd\"",
+    "port": "4040"
+  },
+  {
+    "id": "78b3c498-3a87-405d-b123-ce390a77013f",
+    "name": "backend",
+    "script_path": "C:\\workplace\\link2asr\\start_backend.cmd",
+    "cwd": "C:\\workplace\\link2asr",
+    "command": "cmd.exe /c \"C:\\workplace\\link2asr\\start_backend.cmd\"",
+    "port": "53123"
+  },
+  {
+    "id": "53e91235-0d15-42bd-9cbd-4b5963ebe5a1",
+    "name": "frontend",
+    "script_path": "C:\\workplace\\link2asr\\start_frontend.cmd",
+    "cwd": "C:\\workplace\\link2asr",
+    "command": "cmd.exe /c \"C:\\workplace\\link2asr\\start_frontend.cmd\"",
+    "port": "53124"
+  },
+  {
+    "id": "d5dd84a2-2813-46be-b3d0-6691f54f49f1",
+    "name": "backend",
+    "script_path": "C:\\workplace\\paste-any\\start_backend.cmd",
+    "cwd": "C:\\workplace\\paste-any",
+    "command": "cmd.exe /c \"C:\\workplace\\paste-any\\start_backend.cmd\"",
+    "port": "54123"
+  },
+  {
+    "id": "c5e7c307-165e-4d00-9dbc-ae35638c0f60",
+    "name": "frontend",
+    "script_path": "C:\\workplace\\paste-any\\start_frontend.cmd",
+    "cwd": "C:\\workplace\\paste-any",
+    "command": "cmd.exe /c \"C:\\workplace\\paste-any\\start_frontend.cmd\"",
+    "port": "54124"
+  },
+  {
+    "id": "e123f135-d21f-4cf9-a690-9b3e527dc4e7",
+    "name": "backend",
+    "script_path": "C:\\workplace\\civitai-downloader\\start_backend.cmd",
+    "cwd": "C:\\workplace\\civitai-downloader",
+    "command": "cmd.exe /c \"C:\\workplace\\civitai-downloader\\start_backend.cmd\"",
+    "port": "53133"
+  },
+  {
+    "id": "06c0d25f-42fa-4721-9d45-9e8bef2971e8",
+    "name": "frontend",
+    "script_path": "C:\\workplace\\civitai-downloader\\start_frontend.cmd",
+    "cwd": "C:\\workplace\\civitai-downloader",
+    "command": "cmd.exe /c \"C:\\workplace\\civitai-downloader\\start_frontend.cmd\"",
+    "port": "53134"
+  },
+  {
+    "id": "ecba8263-0601-4ea9-8cb2-c6af363878a5",
+    "name": "comfyui_watchdog",
+    "script_path": "C:\\workplace\\civitai-downloader\\start_comfyui_watchdog.cmd",
+    "cwd": "C:\\workplace\\civitai-downloader",
+    "command": "cmd.exe /c \"C:\\workplace\\civitai-downloader\\start_comfyui_watchdog.cmd\"",
+    "port": "8188"
+  },
+  {
+    "id": "ab284d91-f47d-4c89-a9fc-a6e5ac337132",
+    "name": "backend",
+    "script_path": "C:\\workplace\\iconscout\\start_backend.cmd",
+    "cwd": "C:\\workplace\\iconscout",
+    "command": "cmd.exe /c \"C:\\workplace\\iconscout\\start_backend.cmd\"",
+    "port": "55123"
+  },
+  {
+    "id": "7a29f976-f2b0-4566-a410-097e14cdc547",
+    "name": "frontend",
+    "script_path": "C:\\workplace\\iconscout\\start_frontend.cmd",
+    "cwd": "C:\\workplace\\iconscout",
+    "command": "cmd.exe /c \"C:\\workplace\\iconscout\\start_frontend.cmd\"",
+    "port": "55124"
+  },
+  {
+    "id": "13d10ba2-9d05-4f09-88cd-28da55197844",
+    "name": "openclaw_start",
+    "script_path": "C:\\workplace\\config\\openclaw_start.bat",
+    "cwd": "C:\\workplace\\config",
+    "command": "cmd.exe /c \"C:\\workplace\\config\\openclaw_start.bat\"",
+    "port": "10020"
+  }
+]

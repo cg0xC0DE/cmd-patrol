@@ -1,0 +1,28 @@
+{
+  "active": "https://illaudable-roseanna-unsobering.ngrok-free.dev",
+  "candidates": [
+    "https://overbrutal-semiexclusively-wilhemina.ngrok-free.dev",
+    "https://illaudable-roseanna-unsobering.ngrok-free.dev",
+    "https://dentiled-gennie-stichometrical.ngrok-free.dev"
+  ],
+  "targets": {
+    "link2asr": {
+      "type": "js_config",
+      "file": "C:/workplace/link2asr/frontend/config.js",
+      "key": "window.APP_CONFIG.apiBase",
+      "suffix": "/link2asr-service"
+    },
+    "paste-any": {
+      "type": "js_config",
+      "file": "C:/workplace/paste-any/frontend/config.js",
+      "key": "window.APP_CONFIG.apiBase",
+      "suffix": "/paste-service/api"
+    },
+    "cg0x-site": {
+      "type": "json",
+      "file": "C:/workplace/cg0x-site/public/active-domain.json",
+      "jsonPath": "active",
+      "suffix": ""
+    }
+  }
+}

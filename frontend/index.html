@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cmd-patrol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .log-viewer {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .status-running { color: #22c55e; }
+        .status-stopped { color: #6b7280; }
+        .status-error { color: #ef4444; }
+        .service-item.selected { background-color: #1e3a5f; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .modal-box { background: #1f2937; border: 1px solid #374151; border-radius: 8px; width: 600px; max-height: 70vh; display: flex; flex-direction: column; }
+        .browse-item:hover { background: #374151; }
+        .browse-item.is-file { color: #60a5fa; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700">
+        <h1 class="text-xl font-bold text-blue-400">cmd-patrol</h1>
+        <div class="flex gap-2">
+            <button onclick="openDomains()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium">
+                域名
+            </button>
+            <button onclick="startAll()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm font-medium">
+                全部启动
+            </button>
+            <button onclick="stopAll()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-medium">
+                全部停止
+            </button>
+            <button onclick="openBrowser()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm font-medium">
+                + 注册脚本
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Left: Service List -->
+        <div class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+            <div class="px-3 py-2 text-sm text-gray-400 border-b border-gray-700">
+                服务列表 (<span id="serviceCount">0</span>)
+            </div>
+            <div id="serviceList" class="flex-1 overflow-y-auto">
+                <!-- Services will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Right: Details + Logs -->
+        <div class="flex-1 flex flex-col">
+            <!-- Service Details -->
+            <div id="detailsPanel" class="bg-gray-800 border-b border-gray-700 px-4 py-2 hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <h2 id="detailName" class="font-semibold whitespace-nowrap"></h2>
+                        <span id="detailStatus" class="text-sm"></span>
+                        <span class="text-gray-600">|</span>
+                        <span class="text-xs text-gray-500 truncate" id="detailScript"></span>
+                        <span class="text-gray-600">|</span>
+                        <span class="text-xs text-gray-500">PID: <span id="detailPid"></span></span>
+                        <span class="text-xs text-blue-400 cursor-pointer hover:underline" onclick="editPort()" id="detailPort"></span>
+                    </div>
+                    <div class="flex gap-1 ml-2 flex-shrink-0">
+                        <button onclick="startSelected()" class="bg-green-600 hover:bg-green-700 px-2 py-1 rounded text-xs">启动</button>
+                        <button onclick="stopSelected()" class="bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-xs">停止</button>
+                        <button onclick="restartSelected()" class="bg-yellow-600 hover:bg-yellow-700 px-2 py-1 rounded text-xs">重启</button>
+                        <button onclick="openFolderSelected()" class="bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded text-xs">目录</button>
+                        <button onclick="deleteSelected()" class="bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded text-xs">删除</button>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1 truncate">
+                    <span id="detailCwd"></span> &mdash; <span id="detailCommand" class="text-gray-400"></span>
+                </div>
+            </div>
+
+            <!-- Log Viewer -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <div class="px-4 py-2 bg-gray-800 border-b border-gray-700 flex items-center justify-between">
+                    <span class="text-sm text-gray-400">实时日志</span>
+                    <div class="flex gap-2">
+                        <label class="text-sm text-gray-400 flex items-center gap-1">
+                            <input type="checkbox" id="autoScroll" checked class="rounded">
+                            自动滚动
+                        </label>
+                        <button onclick="clearLogs()" class="text-sm text-gray-400 hover:text-gray-200">清空</button>
+                    </div>
+                </div>
+                <div id="logViewer" class="flex-1 bg-gray-950 p-3 overflow-y-auto log-viewer">
+                    <div class="text-gray-500">选择一个服务查看日志...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Browser Modal -->
+    <div id="browserModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+                <span class="font-semibold">选择脚本文件</span>
+                <button onclick="closeBrowser()" class="text-gray-400 hover:text-white text-lg">&times;</button>
+            </div>
+            <div id="browserPath" class="px-4 py-2 text-xs text-gray-400 border-b border-gray-700 truncate"></div>
+            <div id="browserList" class="flex-1 overflow-y-auto" style="max-height: 50vh;"></div>
+        </div>
+    </div>
+
+    <!-- Domains Modal -->
+    <div id="domainsModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width: 720px;">
+            <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+                <span class="font-semibold">域名管理（手工维护活跃域名）</span>
+                <button onclick="closeDomains()" class="text-gray-400 hover:text-white text-lg">&times;</button>
+            </div>
+            <div class="px-4 py-3 border-b border-gray-700 text-xs text-gray-400">
+                维护候选域名列表，选择当前活跃域名，然后“应用到项目”会写入各项目配置文件。
+            </div>
+            <div class="px-4 py-4 space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-300 mb-2">当前活跃域名</label>
+                    <select id="activeDomainSelect" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm">
+                        <option value="">(未选择)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-2">候选域名（每行一个）</label>
+                    <textarea id="candidatesInput" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm" rows="8" placeholder="https://a.ngrok-free.dev\nhttps://b.ngrok-free.dev"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-2">将写入的目标（项目 / 配置文件）</label>
+                    <div id="targetsList" class="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-xs text-gray-300 space-y-1"></div>
+                </div>
+                <details class="bg-gray-900/40 border border-gray-700 rounded">
+                    <summary class="cursor-pointer px-3 py-2 text-sm text-gray-300">高级：targets 配置（JSON）</summary>
+                    <div class="px-3 pb-3">
+                        <textarea id="targetsJsonInput" class="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-xs font-mono" rows="10" placeholder='{"myproj": {"type": "js_config", "file": "C:/.../config.js", "suffix": "/api"}}'></textarea>
+                        <div class="text-[11px] text-gray-400 mt-2">
+                            修改后点“保存”即可写入 domains.json。随后“应用到项目”会按该配置写文件。
+                        </div>
+                    </div>
+                </details>
+                <div id="domainsStatus" class="text-xs text-gray-400"></div>
+            </div>
+            <div class="px-4 py-3 border-t border-gray-700 flex items-center justify-end gap-2">
+                <button onclick="saveDomains()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm font-medium">保存</button>
+                <button onclick="applyDomains()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm font-medium">应用到项目</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let services = [];
+        let selectedId = null;
+        let logOffset = 0;
+        let logPollTimer = null;
+
+        let domainsCache = null;
+
+        async function fetchServices() {
+            const res = await fetch(`${API_BASE}/api/services`);
+            services = await res.json();
+            renderServices();
+        }
+
+        async function openDomains() {
+            document.getElementById('domainsModal').classList.remove('hidden');
+            await refreshDomains();
+        }
+
+        function closeDomains() {
+            document.getElementById('domainsModal').classList.add('hidden');
+        }
+
+        async function refreshDomains() {
+            const status = document.getElementById('domainsStatus');
+            status.textContent = '加载中...';
+            try {
+                const res = await fetch(`${API_BASE}/api/domains`);
+                if (!res.ok) throw new Error('加载失败');
+                domainsCache = await res.json();
+                const active = (domainsCache.active || '').toString();
+                const candidates = Array.isArray(domainsCache.candidates) ? domainsCache.candidates : [];
+                document.getElementById('candidatesInput').value = candidates.join('\n');
+                syncActiveDomainSelect(active, candidates);
+                renderTargets(domainsCache.targets);
+                document.getElementById('targetsJsonInput').value = JSON.stringify(domainsCache.targets || {}, null, 2);
+                status.textContent = '';
+            } catch (e) {
+                status.textContent = '加载失败';
+            }
+        }
+
+        function syncActiveDomainSelect(active, candidates) {
+            const select = document.getElementById('activeDomainSelect');
+            const unique = Array.from(new Set((candidates || []).map(x => (x || '').toString().trim()).filter(Boolean)));
+
+            select.innerHTML = '<option value="">(未选择)</option>';
+            unique.forEach((d) => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                select.appendChild(opt);
+            });
+
+            const hasActive = active && unique.includes(active);
+            if (!hasActive && active) {
+                const opt = document.createElement('option');
+                opt.value = active;
+                opt.textContent = `${active} (不在候选列表)`;
+                select.appendChild(opt);
+            }
+            select.value = active || '';
+        }
+
+        function renderTargets(targets) {
+            const el = document.getElementById('targetsList');
+            const t = targets && typeof targets === 'object' ? targets : {};
+            const keys = Object.keys(t);
+            if (keys.length === 0) {
+                el.innerHTML = '<div class="text-gray-500">(无 targets 配置)</div>';
+                return;
+            }
+            el.innerHTML = keys.map((k) => {
+                const item = t[k] || {};
+                const file = item.file || '';
+                const suffix = item.suffix || '';
+                const type = item.type || '';
+                return `<div class="flex items-start justify-between gap-3">
+                    <div class="font-medium">${k}</div>
+                    <div class="text-right text-gray-400 break-all">${type} | ${file} ${suffix ? ` | ${suffix}` : ''}</div>
+                </div>`;
+            }).join('');
+        }
+
+        async function saveDomains() {
+            const status = document.getElementById('domainsStatus');
+            status.textContent = '保存中...';
+
+            const active = document.getElementById('activeDomainSelect').value.trim();
+            const candidatesRaw = document.getElementById('candidatesInput').value;
+            const candidates = candidatesRaw
+                .split(/\r?\n/)
+                .map(s => s.trim())
+                .filter(Boolean);
+
+            let targets = null;
+            const targetsRaw = document.getElementById('targetsJsonInput').value.trim();
+            if (targetsRaw) {
+                try {
+                    targets = JSON.parse(targetsRaw);
+                } catch (e) {
+                    status.textContent = 'targets JSON 格式错误';
+                    return;
+                }
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/domains`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(targets ? { active, candidates, targets } : { active, candidates })
+                });
+                if (!res.ok) throw new Error('保存失败');
+                domainsCache = await res.json();
+                syncActiveDomainSelect((domainsCache.active || '').toString(), Array.isArray(domainsCache.candidates) ? domainsCache.candidates : []);
+                renderTargets(domainsCache.targets);
+                status.textContent = '已保存';
+                setTimeout(() => { status.textContent = ''; }, 1200);
+            } catch (e) {
+                status.textContent = '保存失败';
+            }
+        }
+
+        async function applyDomains() {
+            const status = document.getElementById('domainsStatus');
+            status.textContent = '应用中...';
+            try {
+                await saveDomains();
+                const res = await fetch(`${API_BASE}/api/domains/apply`, { method: 'POST' });
+                if (!res.ok) throw new Error('应用失败');
+                const data = await res.json();
+                const results = Array.isArray(data.results) ? data.results : [];
+                const okCount = results.filter(r => r.ok).length;
+                status.textContent = `已应用：${okCount}/${results.length}`;
+            } catch (e) {
+                status.textContent = '应用失败';
+            }
+        }
+
+        function renderServices() {
+            const list = document.getElementById('serviceList');
+            document.getElementById('serviceCount').textContent = services.length;
+            
+            if (services.length === 0) {
+                list.innerHTML = '<div class="p-4 text-gray-500 text-sm">暂无服务，点击右上角注册脚本</div>';
+                return;
+            }
+
+            list.innerHTML = services.map(s => `
+                <div class="service-item p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-700 ${s.id === selectedId ? 'selected' : ''}"
+                     onclick="selectService('${s.id}')">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium">${s.name}</span>
+                        <div class="flex items-center gap-2">
+                            ${s.port ? `<span class="text-xs text-blue-400 bg-blue-900/30 px-1.5 py-0.5 rounded">:${s.port}</span>` : ''}
+                            <span class="status-${s.status} text-sm">${s.status}</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1 truncate">${s.script_path}</div>
+                    ${s.pid ? `<div class="text-xs text-gray-500">PID: ${s.pid}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function selectService(id) {
+            selectedId = id;
+            const service = services.find(s => s.id === id);
+            if (!service) return;
+
+            renderServices();
+            
+            document.getElementById('detailsPanel').classList.remove('hidden');
+            document.getElementById('detailName').textContent = service.name;
+            document.getElementById('detailStatus').textContent = service.status;
+            document.getElementById('detailStatus').className = `text-sm status-${service.status}`;
+            document.getElementById('detailScript').textContent = service.script_path;
+            document.getElementById('detailCwd').textContent = service.cwd;
+            document.getElementById('detailCommand').textContent = service.command;
+            document.getElementById('detailPid').textContent = service.pid || '-';
+            document.getElementById('detailPort').textContent = service.port ? `:${service.port}` : '(设置端口)';
+
+            startLogPolling(id);
+        }
+
+        async function editPort() {
+            if (!selectedId) return;
+            const service = services.find(s => s.id === selectedId);
+            const port = prompt('输入端口号:', service?.port || '');
+            if (port === null) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}/port`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ port: port.trim() })
+            });
+            await fetchServices();
+            selectService(selectedId);
+        }
+
+        function startLogPolling(id) {
+            if (logPollTimer) clearInterval(logPollTimer);
+            document.getElementById('logViewer').innerHTML = '';
+            logOffset = 0;
+            pollLogs();
+            logPollTimer = setInterval(pollLogs, 500);
+        }
+
+        async function pollLogs() {
+            if (!selectedId) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/services/${selectedId}/logs?offset=${logOffset}`);
+                const data = await res.json();
+                if (data.lines && data.lines.length > 0) {
+                    for (const line of data.lines) {
+                        appendLog(line);
+                    }
+                    logOffset = data.offset;
+                }
+            } catch(e) {}
+        }
+
+        function appendLog(line) {
+            const viewer = document.getElementById('logViewer');
+            const div = document.createElement('div');
+            div.textContent = line.replace(/\n$/, '');
+            div.className = 'whitespace-pre-wrap break-all';
+            viewer.appendChild(div);
+
+            if (document.getElementById('autoScroll').checked) {
+                viewer.scrollTop = viewer.scrollHeight;
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('logViewer').innerHTML = '';
+        }
+
+        async function openBrowser() {
+            document.getElementById('browserModal').classList.remove('hidden');
+            await browseTo('');
+        }
+
+        function closeBrowser() {
+            document.getElementById('browserModal').classList.add('hidden');
+        }
+
+        async function browseTo(path) {
+            const res = await fetch(`${API_BASE}/api/browse?path=${encodeURIComponent(path)}`);
+            const data = await res.json();
+            if (data.error) { alert(data.error); return; }
+
+            document.getElementById('browserPath').textContent = data.current || '我的电脑';
+
+            let html = '';
+            if (data.parent !== undefined && data.parent !== '') {
+                html += `<div class="browse-item px-4 py-2 cursor-pointer text-gray-300 border-b border-gray-800" onclick="browseTo('${data.parent.replace(/\\/g, '\\\\')}')">⬆ ..</div>`;
+            }
+            for (const item of data.items) {
+                const escaped = item.path.replace(/\\/g, '\\\\');
+                if (item.type === 'dir') {
+                    html += `<div class="browse-item px-4 py-2 cursor-pointer text-gray-300 border-b border-gray-800" onclick="browseTo('${escaped}')">📁 ${item.name}</div>`;
+                } else {
+                    html += `<div class="browse-item is-file px-4 py-2 cursor-pointer border-b border-gray-800" onclick="selectScript('${escaped}')">📜 ${item.name}</div>`;
+                }
+            }
+            if (data.items.length === 0 && !data.parent) {
+                html = '<div class="px-4 py-3 text-gray-500 text-sm">空目录</div>';
+            }
+            document.getElementById('browserList').innerHTML = html;
+        }
+
+        async function selectScript(path) {
+            closeBrowser();
+            const res = await fetch(`${API_BASE}/api/services`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ script_path: path })
+            });
+
+            if (res.ok) {
+                await fetchServices();
+            } else {
+                const err = await res.json();
+                alert('注册失败: ' + (err.error || '未知错误'));
+            }
+        }
+
+        async function startAll() {
+            for (const s of services) {
+                if (s.status !== 'running') {
+                    await fetch(`${API_BASE}/api/services/${s.id}/start`, { method: 'POST' });
+                }
+            }
+            await fetchServices();
+        }
+
+        async function stopAll() {
+            for (const s of services) {
+                if (s.status === 'running') {
+                    await fetch(`${API_BASE}/api/services/${s.id}/stop`, { method: 'POST' });
+                }
+            }
+            await fetchServices();
+        }
+
+        async function startSelected() {
+            if (!selectedId) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}/start`, { method: 'POST' });
+            await fetchServices();
+            selectService(selectedId);
+        }
+
+        async function stopSelected() {
+            if (!selectedId) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}/stop`, { method: 'POST' });
+            await fetchServices();
+            selectService(selectedId);
+        }
+
+        async function restartSelected() {
+            if (!selectedId) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}/restart`, { method: 'POST' });
+            await fetchServices();
+            selectService(selectedId);
+        }
+
+        async function openFolderSelected() {
+            if (!selectedId) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}/open-folder`, { method: 'POST' });
+        }
+
+        async function deleteSelected() {
+            if (!selectedId) return;
+            if (!confirm('确定要删除这个服务吗？')) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}`, { method: 'DELETE' });
+            selectedId = null;
+            document.getElementById('detailsPanel').classList.add('hidden');
+            document.getElementById('logViewer').innerHTML = '<div class="text-gray-500">选择一个服务查看日志...</div>';
+            await fetchServices();
+        }
+
+        setInterval(fetchServices, 3000);
+        fetchServices();
+    </script>
+</body>
+</html>
