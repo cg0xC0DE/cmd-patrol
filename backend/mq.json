@@ -1,0 +1,450 @@
+[
+  {
+    "id": "6f978e2d-ba81-4236-a779-227581c976a5",
+    "source": "civitai-downloader",
+    "type": "metadata_error",
+    "title": "??: ?????????",
+    "detail": "file: model_preview_001.png - EXIF data corrupted",
+    "status": "done",
+    "created_at": "2026-02-18T11:20:26.987661",
+    "acked_at": "2026-02-18T13:51:49.916699",
+    "done_at": "2026-02-18T13:51:49.916699",
+    "meta": {}
+  },
+  {
+    "id": "de3dd1e5-2d72-407e-9be8-f946a1c8288d",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/81080164",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:43:24.866854",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/81080164",
+      "fav_id": "31f49c4c"
+    }
+  },
+  {
+    "id": "3d1a4ed1-c83c-4c1f-974b-36c84201a999",
+    "source": "civitai-downloader",
+    "type": "download_fail",
+    "title": "下载失败: lazympos.safetensors",
+    "detail": "type_subtype: embedding.\nURL: https://civitai.com/models/1302719?modelVersionId=1558647\nError: 未知类型: embedding.",
+    "status": "done",
+    "created_at": "2026-02-18T13:43:41.363300",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "kind": "embedding",
+      "name": "lazympos.safetensors",
+      "url": "https://civitai.com/images/78553499",
+      "fav_id": "78a218f1"
+    }
+  },
+  {
+    "id": "6cd6186d-f566-4a18-ad1c-854b1fb64c7a",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/57166213",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:43:51.612858",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/57166213",
+      "fav_id": "8a832605"
+    }
+  },
+  {
+    "id": "45894ddf-4627-4bfe-bdb2-35dd4bb37baf",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/57787798",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:44:02.925242",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/57787798",
+      "fav_id": "b744b794"
+    }
+  },
+  {
+    "id": "a81991e9-2774-405b-8096-856f5381433d",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/59032576",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:44:15.048643",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/59032576",
+      "fav_id": "29457e57"
+    }
+  },
+  {
+    "id": "f1bd2a30-36ff-4d64-b50d-7112024922cf",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/107105977",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:44:25.002427",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/107105977",
+      "fav_id": "ac191ea4"
+    }
+  },
+  {
+    "id": "6ee151a1-adc7-4c86-a8f9-8635132be57f",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/103274314",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:44:36.659161",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/103274314",
+      "fav_id": "ef64f5fa"
+    }
+  },
+  {
+    "id": "ed45cdb8-82ba-4e6c-9307-2e58b936c2d1",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/102646213",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:46:25.134999",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/102646213",
+      "fav_id": "1ef82bfd"
+    }
+  },
+  {
+    "id": "ae736c8b-eb0b-44eb-b445-c9470a8ba112",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/101631659",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:46:36.575077",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/101631659",
+      "fav_id": "bd3a6ad6"
+    }
+  },
+  {
+    "id": "57369326-da35-4df6-b7e7-7b678ad76169",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/100796993",
+    "detail": "Workflow not found: lora",
+    "status": "done",
+    "created_at": "2026-02-18T13:46:48.798324",
+    "acked_at": "2026-02-18T13:51:54.447266",
+    "done_at": "2026-02-18T13:51:54.447266",
+    "meta": {
+      "url": "https://civitai.com/images/100796993",
+      "fav_id": "60b6c933"
+    }
+  },
+  {
+    "id": "b4496ac8-22c8-45a0-b69e-e85771d4c8ec",
+    "source": "civitai-downloader",
+    "type": "model_still_missing",
+    "title": "下载后仍缺模型: https://civitai.com/images/94463479",
+    "detail": "LoRA: Prinz Eugen (Azur Lane: Slow Ahead!)",
+    "status": "done",
+    "created_at": "2026-02-18T13:55:47.695902",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "url": "https://civitai.com/images/94463479",
+      "fav_id": "0eacedf9"
+    }
+  },
+  {
+    "id": "0722f2fb-5ac5-4617-8c73-7d1ffbcd730b",
+    "source": "civitai-downloader",
+    "type": "model_still_missing",
+    "title": "下载后仍缺模型: https://civitai.com/images/85125724",
+    "detail": "Checkpoint: Illusoria",
+    "status": "done",
+    "created_at": "2026-02-18T14:12:17.158114",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "url": "https://civitai.com/images/85125724",
+      "fav_id": "ed5ba827"
+    }
+  },
+  {
+    "id": "3a9633f2-c212-47dd-a20f-de1ac0dd789f",
+    "source": "civitai-downloader",
+    "type": "download_fail",
+    "title": "下载失败: lazympos.safetensors",
+    "detail": "type_subtype: embedding._root\nURL: https://civitai.com/api/v1/model-versions/1558647\nError: 无法解析 model_id",
+    "status": "done",
+    "created_at": "2026-02-18T14:18:07.044183",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "kind": "embedding",
+      "name": "lazympos.safetensors",
+      "url": "https://civitai.com/images/78067670",
+      "fav_id": "45f02114"
+    }
+  },
+  {
+    "id": "db7074fd-c679-450d-9993-bb3713dfe581",
+    "source": "civitai-downloader",
+    "type": "classify_uncertain",
+    "title": "LoRA 分类不确定: version_1533177",
+    "detail": "LLM 无法确定子分类\nbaseModel: Illustrious\nURL: https://civitai.com/images/84626388",
+    "status": "done",
+    "created_at": "2026-02-18T14:18:55.294198",
+    "acked_at": "2026-02-18T16:33:33.591334",
+    "done_at": "2026-02-18T16:33:33.591334",
+    "meta": {
+      "kind": "lora",
+      "name": "version_1533177",
+      "base_model": "Illustrious",
+      "url": "https://civitai.com/images/84626388",
+      "fav_id": "98ac6d67"
+    }
+  },
+  {
+    "id": "d34ec51e-aa24-4246-a90e-28b0ad7eba8a",
+    "source": "civitai-downloader",
+    "type": "download_fail",
+    "title": "下载失败: lazympos.safetensors",
+    "detail": "type_subtype: embedding._root\nURL: https://civitai.com/api/v1/model-versions/1558647\nError: 无法解析 model_id",
+    "status": "done",
+    "created_at": "2026-02-18T14:41:02.837077",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "kind": "embedding",
+      "name": "lazympos.safetensors",
+      "url": "https://civitai.com/images/78429193",
+      "fav_id": "8b8f32ef"
+    }
+  },
+  {
+    "id": "a018aa8f-5ed3-4913-87d9-205e231c5be7",
+    "source": "civitai-downloader",
+    "type": "download_fail",
+    "title": "下载失败: lazympos.safetensors",
+    "detail": "type_subtype: embedding._root\nURL: https://civitai.com/api/v1/model-versions/1558647\nError: 无法解析 model_id",
+    "status": "done",
+    "created_at": "2026-02-18T14:41:32.746873",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "kind": "embedding",
+      "name": "lazympos.safetensors",
+      "url": "https://civitai.com/images/78067696",
+      "fav_id": "da4555c0"
+    }
+  },
+  {
+    "id": "d5d0faf8-10dd-40ee-a8ca-9144b5fd06f9",
+    "source": "civitai-downloader",
+    "type": "download_fail",
+    "title": "下载失败: lazympos.safetensors",
+    "detail": "type_subtype: embedding._root\nURL: https://civitai.com/api/v1/model-versions/1558647\nError: 无法解析 model_id",
+    "status": "done",
+    "created_at": "2026-02-18T14:41:57.239830",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "kind": "embedding",
+      "name": "lazympos.safetensors",
+      "url": "https://civitai.com/images/78429249",
+      "fav_id": "b2d11075"
+    }
+  },
+  {
+    "id": "1644ccae-2f35-45f5-95b3-1c6658595f20",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/74199273",
+    "detail": "ComfyUI 拒绝了工作流: Prompt outputs failed validation",
+    "status": "done",
+    "created_at": "2026-02-18T16:11:29.992695",
+    "acked_at": "2026-02-18T17:19:17.880185",
+    "done_at": "2026-02-18T17:19:17.880185",
+    "meta": {
+      "url": "https://civitai.com/images/74199273",
+      "fav_id": "f40bb7ce"
+    }
+  },
+  {
+    "id": "a2755b21-4354-458a-a48a-601d68608316",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/73319854",
+    "detail": "ComfyUI 拒绝了工作流: Prompt outputs failed validation",
+    "status": "done",
+    "created_at": "2026-02-18T16:11:36.991023",
+    "acked_at": "2026-02-18T17:19:16.921069",
+    "done_at": "2026-02-18T17:19:16.921069",
+    "meta": {
+      "url": "https://civitai.com/images/73319854",
+      "fav_id": "03298e6f"
+    }
+  },
+  {
+    "id": "f4c17649-0641-45e8-9982-b935bcb514c3",
+    "source": "civitai-downloader",
+    "type": "model_still_missing",
+    "title": "下载后仍缺模型: https://civitai.com/images/80778068",
+    "detail": "LoRA: Anime X Reality | Shiiro's Styles",
+    "status": "done",
+    "created_at": "2026-02-18T16:12:35.173879",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "url": "https://civitai.com/images/80778068",
+      "fav_id": "a770229c"
+    }
+  },
+  {
+    "id": "0494a80c-d238-44a0-ad6f-ea024a6671fd",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/57085479",
+    "detail": "ComfyUI 拒绝了工作流: Prompt outputs failed validation",
+    "status": "done",
+    "created_at": "2026-02-18T16:13:54.631992",
+    "acked_at": "2026-02-18T17:19:15.129189",
+    "done_at": "2026-02-18T17:19:15.129189",
+    "meta": {
+      "url": "https://civitai.com/images/57085479",
+      "fav_id": "ea564873"
+    }
+  },
+  {
+    "id": "27540404-3d8b-40db-b76c-c4e96d624370",
+    "source": "civitai-downloader",
+    "type": "model_still_missing",
+    "title": "下载后仍缺模型: https://civitai.com/images/34877374",
+    "detail": "Checkpoint: real pony",
+    "status": "done",
+    "created_at": "2026-02-18T16:15:58.761440",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "url": "https://civitai.com/images/34877374",
+      "fav_id": "f48c94f9"
+    }
+  },
+  {
+    "id": "a7d0e97b-8065-43fa-8e03-58a506098b26",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/78907178",
+    "detail": "ComfyUI 拒绝了工作流: Prompt outputs failed validation",
+    "status": "done",
+    "created_at": "2026-02-18T16:17:17.689133",
+    "acked_at": "2026-02-18T17:19:10.924887",
+    "done_at": "2026-02-18T17:19:10.924887",
+    "meta": {
+      "url": "https://civitai.com/images/78907178",
+      "fav_id": "d4596303"
+    }
+  },
+  {
+    "id": "6d3b7999-910a-413f-9e1c-b6a46d3dd9e0",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/76880528",
+    "detail": "ComfyUI 拒绝了工作流: Prompt outputs failed validation",
+    "status": "done",
+    "created_at": "2026-02-18T16:17:24.910035",
+    "acked_at": "2026-02-18T17:19:09.592953",
+    "done_at": "2026-02-18T17:19:09.592953",
+    "meta": {
+      "url": "https://civitai.com/images/76880528",
+      "fav_id": "1eb910be"
+    }
+  },
+  {
+    "id": "dd2ee706-a495-4de8-84d9-3a4cce156d09",
+    "source": "civitai-downloader",
+    "type": "generate_fail",
+    "title": "生成失败: https://civitai.com/images/85884641",
+    "detail": "ComfyUI 拒绝了工作流: Prompt outputs failed validation",
+    "status": "done",
+    "created_at": "2026-02-18T16:17:32.065955",
+    "acked_at": "2026-02-18T17:19:06.898481",
+    "done_at": "2026-02-18T17:19:06.898481",
+    "meta": {
+      "url": "https://civitai.com/images/85884641",
+      "fav_id": "424ee605"
+    }
+  },
+  {
+    "id": "05051bcf-08c4-4723-8809-bbd22bbfa639",
+    "source": "civitai-downloader",
+    "type": "classify_uncertain",
+    "title": "LoRA 分类不确定: version_1899496",
+    "detail": "LLM 无法确定子分类\nbaseModel: Illustrious\nURL: https://civitai.com/images/82941381",
+    "status": "done",
+    "created_at": "2026-02-18T16:17:46.904092",
+    "acked_at": "2026-02-18T16:33:13.229235",
+    "done_at": "2026-02-18T16:33:13.229235",
+    "meta": {
+      "kind": "lora",
+      "name": "version_1899496",
+      "base_model": "Illustrious",
+      "url": "https://civitai.com/images/82941381",
+      "fav_id": "7d337ca6"
+    }
+  },
+  {
+    "id": "2f0a9498-d116-4392-962e-72fb297c0ad7",
+    "source": "civitai-downloader",
+    "type": "model_still_missing",
+    "title": "下载后仍缺模型: https://civitai.com/images/104279394",
+    "detail": "LoRA: Rain",
+    "status": "done",
+    "created_at": "2026-02-18T16:19:06.335940",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "url": "https://civitai.com/images/104279394",
+      "fav_id": "542d6a03"
+    }
+  },
+  {
+    "id": "a6efe07d-0495-431f-9b2d-59a112d4d02d",
+    "source": "civitai-downloader",
+    "type": "model_still_missing",
+    "title": "下载后仍缺模型: https://civitai.com/images/87283890",
+    "detail": "Checkpoint: Unfazed3D",
+    "status": "done",
+    "created_at": "2026-02-18T16:25:33.181448",
+    "acked_at": "2026-02-18T17:19:38.460774",
+    "done_at": "2026-02-18T17:19:38.460774",
+    "meta": {
+      "url": "https://civitai.com/images/87283890",
+      "fav_id": "425f3e3e"
+    }
+  }
+]

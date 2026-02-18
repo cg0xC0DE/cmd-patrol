@@ -19,6 +19,15 @@
         .modal-box { background: #1f2937; border: 1px solid #374151; border-radius: 8px; width: 600px; max-height: 70vh; display: flex; flex-direction: column; }
         .browse-item:hover { background: #374151; }
         .browse-item.is-file { color: #60a5fa; }
+
+        /* Slim dark scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        textarea::-webkit-scrollbar-thumb { background: #374151; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        * { scrollbar-width: thin; scrollbar-color: #4b5563 transparent; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 h-screen flex flex-col">
@@ -26,6 +35,9 @@
     <header class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700">
         <h1 class="text-xl font-bold text-blue-400">cmd-patrol</h1>
         <div class="flex gap-2">
+            <button onclick="openMQ()" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-sm font-medium relative">
+                消息队列 <span id="mqBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"></span>
+            </button>
             <button onclick="openDomains()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium">
                 域名
             </button>
@@ -80,20 +92,32 @@
                 </div>
             </div>
 
-            <!-- Log Viewer -->
+            <!-- Tab Bar + Content -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 <div class="px-4 py-2 bg-gray-800 border-b border-gray-700 flex items-center justify-between">
-                    <span class="text-sm text-gray-400">实时日志</span>
-                    <div class="flex gap-2">
+                    <div class="flex gap-1">
+                        <button id="tabLogs" onclick="switchTab('logs')" class="px-3 py-1 text-sm rounded-t font-medium bg-gray-950 text-gray-200">实时日志</button>
+                        <button id="tabConfig" onclick="switchTab('config')" class="px-3 py-1 text-sm rounded-t font-medium text-gray-500 hover:text-gray-300">配置文件</button>
+                    </div>
+                    <div id="logControls" class="flex gap-2">
                         <label class="text-sm text-gray-400 flex items-center gap-1">
                             <input type="checkbox" id="autoScroll" checked class="rounded">
                             自动滚动
                         </label>
                         <button onclick="clearLogs()" class="text-sm text-gray-400 hover:text-gray-200">清空</button>
                     </div>
+                    <div id="configControls" class="flex gap-2 hidden">
+                        <span id="configFilePath" class="text-xs text-gray-500 truncate max-w-md cursor-pointer hover:text-gray-300" onclick="setConfigPath()"></span>
+                        <button onclick="saveConfig()" class="text-sm text-green-400 hover:text-green-200 font-medium">保存</button>
+                        <button onclick="loadConfig()" class="text-sm text-gray-400 hover:text-gray-200">刷新</button>
+                        <button onclick="setConfigPath()" class="text-sm text-gray-400 hover:text-gray-200">设置路径</button>
+                    </div>
                 </div>
                 <div id="logViewer" class="flex-1 bg-gray-950 p-3 overflow-y-auto log-viewer">
                     <div class="text-gray-500">选择一个服务查看日志...</div>
+                </div>
+                <div id="configEditor" class="flex-1 flex flex-col overflow-hidden hidden">
+                    <textarea id="configTextarea" class="flex-1 bg-gray-950 text-gray-200 p-3 font-mono text-sm resize-none outline-none border-none" spellcheck="false" placeholder="未设置配置文件路径，点击上方「设置路径」关联配置文件..."></textarea>
                 </div>
             </div>
         </div>
@@ -121,7 +145,7 @@
             <div class="px-4 py-3 border-b border-gray-700 text-xs text-gray-400">
                 维护候选域名列表，选择当前活跃域名，然后“应用到项目”会写入各项目配置文件。
             </div>
-            <div class="px-4 py-4 space-y-4">
+            <div class="px-4 py-4 space-y-4 overflow-y-auto flex-1">
                 <div>
                     <label class="block text-sm text-gray-300 mb-2">当前活跃域名</label>
                     <select id="activeDomainSelect" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm">
@@ -130,7 +154,7 @@
                 </div>
                 <div>
                     <label class="block text-sm text-gray-300 mb-2">候选域名（每行一个）</label>
-                    <textarea id="candidatesInput" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm" rows="8" placeholder="https://a.ngrok-free.dev\nhttps://b.ngrok-free.dev"></textarea>
+                    <textarea id="candidatesInput" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm" rows="4" placeholder="https://a.ngrok-free.dev\nhttps://b.ngrok-free.dev"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-300 mb-2">将写入的目标（项目 / 配置文件）</label>
@@ -154,12 +178,45 @@
         </div>
     </div>
 
+    <!-- MQ Modal -->
+    <div id="mqModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width: 800px; max-height: 80vh;">
+            <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="font-semibold">消息队列</span>
+                    <span id="mqStats" class="text-xs text-gray-400"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="mqFilterStatus" onchange="loadMQ()" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs">
+                        <option value="new,ack">待处理 (new+ack)</option>
+                        <option value="new">仅 new</option>
+                        <option value="ack">仅 ack</option>
+                        <option value="done">已处理</option>
+                        <option value="">全部</option>
+                    </select>
+                    <select id="mqFilterSource" onchange="loadMQ()" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs">
+                        <option value="">全部来源</option>
+                    </select>
+                    <button onclick="closeMQ()" class="text-gray-400 hover:text-white text-lg">&times;</button>
+                </div>
+            </div>
+            <div id="mqList" class="flex-1 overflow-y-auto" style="max-height: 60vh;"></div>
+            <div class="px-4 py-2 border-t border-gray-700 flex items-center justify-between">
+                <span id="mqCount" class="text-xs text-gray-500"></span>
+                <div class="flex gap-2">
+                    <button onclick="mqBatchAck()" class="text-xs text-gray-400 hover:text-gray-200">全部标为已通知</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '';
         let services = [];
         let selectedId = null;
         let logOffset = 0;
         let logPollTimer = null;
+        let currentTab = 'logs';
 
         let domainsCache = null;
 
@@ -303,12 +360,18 @@
                 return;
             }
 
-            list.innerHTML = services.map(s => `
+            const sorted = [...services].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+            list.innerHTML = sorted.map(s => `
                 <div class="service-item p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-700 ${s.id === selectedId ? 'selected' : ''}"
                      onclick="selectService('${s.id}')">
                     <div class="flex items-center justify-between">
-                        <span class="font-medium">${s.name}</span>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="text-xs cursor-pointer flex-shrink-0 ${s.pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}"
+                                  onclick="event.stopPropagation(); togglePin('${s.id}', ${!s.pinned})"
+                                  title="${s.pinned ? '取消置顶' : '置顶'}">&#9733;</span>
+                            <span class="font-medium truncate">${s.name}</span>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
                             ${s.port ? `<span class="text-xs text-blue-400 bg-blue-900/30 px-1.5 py-0.5 rounded">:${s.port}</span>` : ''}
                             <span class="status-${s.status} text-sm">${s.status}</span>
                         </div>
@@ -317,6 +380,15 @@
                     ${s.pid ? `<div class="text-xs text-gray-500">PID: ${s.pid}</div>` : ''}
                 </div>
             `).join('');
+        }
+
+        async function togglePin(id, pinned) {
+            await fetch(`${API_BASE}/api/services/${id}/pin`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pinned })
+            });
+            await fetchServices();
         }
 
         function selectService(id) {
@@ -389,6 +461,104 @@
 
         function clearLogs() {
             document.getElementById('logViewer').innerHTML = '';
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabLogs = document.getElementById('tabLogs');
+            const tabConfig = document.getElementById('tabConfig');
+            const logViewer = document.getElementById('logViewer');
+            const logControls = document.getElementById('logControls');
+            const configEditor = document.getElementById('configEditor');
+            const configControls = document.getElementById('configControls');
+
+            if (tab === 'logs') {
+                tabLogs.className = 'px-3 py-1 text-sm rounded-t font-medium bg-gray-950 text-gray-200';
+                tabConfig.className = 'px-3 py-1 text-sm rounded-t font-medium text-gray-500 hover:text-gray-300';
+                logViewer.classList.remove('hidden');
+                logControls.classList.remove('hidden');
+                configEditor.classList.add('hidden');
+                configControls.classList.add('hidden');
+            } else {
+                tabConfig.className = 'px-3 py-1 text-sm rounded-t font-medium bg-gray-950 text-gray-200';
+                tabLogs.className = 'px-3 py-1 text-sm rounded-t font-medium text-gray-500 hover:text-gray-300';
+                logViewer.classList.add('hidden');
+                logControls.classList.add('hidden');
+                configEditor.classList.remove('hidden');
+                configControls.classList.remove('hidden');
+                loadConfig();
+            }
+        }
+
+        async function loadConfig() {
+            if (!selectedId) return;
+            const service = services.find(s => s.id === selectedId);
+            const pathEl = document.getElementById('configFilePath');
+            const textarea = document.getElementById('configTextarea');
+
+            if (!service || !service.config_file) {
+                pathEl.textContent = '(未设置配置文件路径)';
+                textarea.value = '';
+                textarea.placeholder = '未设置配置文件路径，点击右侧「设置路径」关联配置文件...';
+                return;
+            }
+
+            pathEl.textContent = service.config_file;
+            try {
+                const res = await fetch(`${API_BASE}/api/services/${selectedId}/config`);
+                const data = await res.json();
+                if (res.ok) {
+                    textarea.value = data.content;
+                } else {
+                    textarea.value = '';
+                    textarea.placeholder = data.error || '无法读取配置文件';
+                }
+            } catch(e) {
+                textarea.value = '';
+                textarea.placeholder = '加载失败: ' + e.message;
+            }
+        }
+
+        async function saveConfig() {
+            if (!selectedId) return;
+            const service = services.find(s => s.id === selectedId);
+            if (!service || !service.config_file) {
+                alert('请先设置配置文件路径');
+                return;
+            }
+            const content = document.getElementById('configTextarea').value;
+            try {
+                const res = await fetch(`${API_BASE}/api/services/${selectedId}/config`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('configFilePath').textContent = service.config_file + ' (已保存)';
+                    setTimeout(() => {
+                        document.getElementById('configFilePath').textContent = service.config_file;
+                    }, 2000);
+                } else {
+                    alert('保存失败: ' + (data.error || '未知错误'));
+                }
+            } catch(e) {
+                alert('保存失败: ' + e.message);
+            }
+        }
+
+        async function setConfigPath() {
+            if (!selectedId) return;
+            const service = services.find(s => s.id === selectedId);
+            const path = prompt('输入配置文件完整路径:', service?.config_file || '');
+            if (path === null) return;
+            await fetch(`${API_BASE}/api/services/${selectedId}/config-path`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config_file: path.trim() })
+            });
+            await fetchServices();
+            if (currentTab === 'config') loadConfig();
         }
 
         async function openBrowser() {
@@ -495,8 +665,139 @@
             await fetchServices();
         }
 
+        // ── MQ functions ──────────────────────────────────────
+        let mqMessages = [];
+
+        async function openMQ() {
+            document.getElementById('mqModal').classList.remove('hidden');
+            await loadMQ();
+        }
+
+        function closeMQ() {
+            document.getElementById('mqModal').classList.add('hidden');
+        }
+
+        async function loadMQ() {
+            const status = document.getElementById('mqFilterStatus').value;
+            const source = document.getElementById('mqFilterSource').value;
+            let url = `${API_BASE}/api/mq/messages?limit=200`;
+            if (status) url += `&status=${status}`;
+            if (source) url += `&source=${encodeURIComponent(source)}`;
+
+            const [msgRes, statsRes] = await Promise.all([
+                fetch(url),
+                fetch(`${API_BASE}/api/mq/stats`)
+            ]);
+            const data = await msgRes.json();
+            const stats = await statsRes.json();
+            mqMessages = data.messages;
+
+            document.getElementById('mqStats').textContent =
+                `new: ${stats.new} | ack: ${stats.ack} | done: ${stats.done} | total: ${stats.total}`;
+            document.getElementById('mqCount').textContent = `显示 ${mqMessages.length} / ${data.total} 条`;
+
+            // update badge
+            const badge = document.getElementById('mqBadge');
+            if (stats.new > 0) {
+                badge.textContent = stats.new > 99 ? '99+' : stats.new;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            renderMQ();
+        }
+
+        function renderMQ() {
+            const el = document.getElementById('mqList');
+            if (!mqMessages.length) {
+                el.innerHTML = '<div class="p-4 text-gray-500 text-sm text-center">暂无消息</div>';
+                return;
+            }
+            el.innerHTML = mqMessages.map(m => {
+                const statusColor = m.status === 'new' ? 'text-yellow-400' :
+                                    m.status === 'ack' ? 'text-blue-400' : 'text-gray-500';
+                const statusDot = m.status === 'new' ? '🔴' :
+                                  m.status === 'ack' ? '🟡' : '✅';
+                const time = m.created_at ? m.created_at.replace('T', ' ').substring(0, 19) : '';
+                const actions = m.status !== 'done'
+                    ? `<div class="flex gap-1 mt-1">
+                        ${m.status === 'new' ? `<button onclick="mqAckOne('${m.id}')" class="text-xs text-blue-400 hover:text-blue-200">标为已通知</button>` : ''}
+                        <button onclick="mqDoneOne('${m.id}')" class="text-xs text-green-400 hover:text-green-200">标为已处理</button>
+                        <button onclick="mqBatchDoneBefore('${m.id}')" class="text-xs text-gray-400 hover:text-gray-200">此条及之前全部处理</button>
+                       </div>`
+                    : '';
+                return `<div class="px-4 py-2 border-b border-gray-700/50 hover:bg-gray-800/50">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs">${statusDot}</span>
+                                <span class="text-sm font-medium">${escapeHtml(m.title)}</span>
+                                <span class="text-xs ${statusColor}">${m.status}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-0.5">
+                                <span class="text-gray-400">${escapeHtml(m.source)}</span>
+                                ${m.type ? `<span class="text-gray-600">/ ${escapeHtml(m.type)}</span>` : ''}
+                                <span class="ml-2">${time}</span>
+                            </div>
+                            ${m.detail ? `<div class="text-xs text-gray-400 mt-1 whitespace-pre-wrap break-all">${escapeHtml(m.detail)}</div>` : ''}
+                        </div>
+                    </div>
+                    ${actions}
+                </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        async function mqAckOne(id) {
+            await fetch(`${API_BASE}/api/mq/messages/${id}/ack`, { method: 'POST' });
+            await loadMQ();
+        }
+
+        async function mqDoneOne(id) {
+            await fetch(`${API_BASE}/api/mq/messages/${id}/done`, { method: 'POST' });
+            await loadMQ();
+        }
+
+        async function mqBatchDoneBefore(id) {
+            const msg = mqMessages.find(m => m.id === id);
+            if (!msg) return;
+            if (!confirm(`确定要将此消息及之前的所有未处理消息标为已处理吗？`)) return;
+            await fetch(`${API_BASE}/api/mq/batch-done`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ before_id: id })
+            });
+            await loadMQ();
+        }
+
+        async function mqBatchAck() {
+            await fetch(`${API_BASE}/api/mq/batch-ack`, { method: 'POST' });
+            await loadMQ();
+        }
+
+        async function refreshMQBadge() {
+            try {
+                const res = await fetch(`${API_BASE}/api/mq/stats`);
+                const stats = await res.json();
+                const badge = document.getElementById('mqBadge');
+                if (stats.new > 0) {
+                    badge.textContent = stats.new > 99 ? '99+' : stats.new;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch(e) {}
+        }
+
+        setInterval(refreshMQBadge, 5000);
         setInterval(fetchServices, 3000);
         fetchServices();
+        refreshMQBadge();
     </script>
 </body>
 </html>

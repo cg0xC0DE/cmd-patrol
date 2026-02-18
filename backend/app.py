@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from process_manager import ProcessManager
 from domain_manager import load_domains, save_domains, apply_active_domain
+import mq_store
 import os
 
 app = Flask(__name__, static_folder="../frontend", static_url_path="")
@@ -79,6 +80,61 @@ def set_port(id):
     return jsonify(proc.to_dict())
 
 
+@app.route("/api/services/<id>/pin", methods=["PUT"])
+def set_pin(id):
+    proc = manager.get(id)
+    if not proc:
+        return jsonify({"error": "Service not found"}), 404
+    proc.pinned = bool(request.json.get("pinned", False))
+    manager._save()
+    return jsonify(proc.to_dict())
+
+
+@app.route("/api/services/<id>/config-path", methods=["PUT"])
+def set_config_path(id):
+    proc = manager.get(id)
+    if not proc:
+        return jsonify({"error": "Service not found"}), 404
+    proc.config_file = request.json.get("config_file", "")
+    manager._save()
+    return jsonify(proc.to_dict())
+
+
+@app.route("/api/services/<id>/config", methods=["GET"])
+def read_config(id):
+    proc = manager.get(id)
+    if not proc:
+        return jsonify({"error": "Service not found"}), 404
+    if not proc.config_file or not os.path.isfile(proc.config_file):
+        return jsonify({"error": "No config file set", "config_file": proc.config_file}), 404
+    try:
+        for enc in ("utf-8", "gbk", "latin-1"):
+            try:
+                content = open(proc.config_file, encoding=enc).read()
+                return jsonify({"config_file": proc.config_file, "content": content})
+            except UnicodeDecodeError:
+                continue
+        return jsonify({"error": "Cannot decode file"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/services/<id>/config", methods=["PUT"])
+def write_config(id):
+    proc = manager.get(id)
+    if not proc:
+        return jsonify({"error": "Service not found"}), 404
+    if not proc.config_file:
+        return jsonify({"error": "No config file set"}), 400
+    content = request.json.get("content", "")
+    try:
+        with open(proc.config_file, "w", encoding="utf-8") as f:
+            f.write(content)
+        return jsonify({"success": True, "config_file": proc.config_file})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/services/<id>/open-folder", methods=["POST"])
 def open_folder(id):
     proc = manager.get(id)
@@ -147,5 +203,78 @@ def apply_domains():
     return jsonify({"active": active, "results": results})
 
 
+# ── MQ endpoints ──────────────────────────────────────────────
+
+@app.route("/api/mq/publish", methods=["POST"])
+def mq_publish():
+    data = request.json or {}
+    source = data.get("source", "")
+    etype = data.get("type", "")
+    title = data.get("title", "")
+    if not source or not title:
+        return jsonify({"error": "source and title required"}), 400
+    msg = mq_store.publish(
+        source=source,
+        type=etype,
+        title=title,
+        detail=data.get("detail", ""),
+        meta=data.get("meta"),
+    )
+    return jsonify(msg), 201
+
+
+@app.route("/api/mq/messages", methods=["GET"])
+def mq_list():
+    status = request.args.get("status")
+    source = request.args.get("source")
+    limit = request.args.get("limit", 200, type=int)
+    offset = request.args.get("offset", 0, type=int)
+    return jsonify(mq_store.query(status=status, source=source, limit=limit, offset=offset))
+
+
+@app.route("/api/mq/messages/<msg_id>", methods=["GET"])
+def mq_get(msg_id):
+    msg = mq_store.get(msg_id)
+    if not msg:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify(msg)
+
+
+@app.route("/api/mq/messages/<msg_id>/ack", methods=["POST"])
+def mq_ack(msg_id):
+    msg = mq_store.ack(msg_id)
+    if not msg:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify(msg)
+
+
+@app.route("/api/mq/messages/<msg_id>/done", methods=["POST"])
+def mq_done(msg_id):
+    msg = mq_store.done(msg_id)
+    if not msg:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify(msg)
+
+
+@app.route("/api/mq/batch-done", methods=["POST"])
+def mq_batch_done():
+    before_id = (request.json or {}).get("before_id", "")
+    if not before_id:
+        return jsonify({"error": "before_id required"}), 400
+    count = mq_store.batch_done(before_id)
+    return jsonify({"count": count})
+
+
+@app.route("/api/mq/batch-ack", methods=["POST"])
+def mq_batch_ack():
+    count = mq_store.batch_ack_new()
+    return jsonify({"count": count})
+
+
+@app.route("/api/mq/stats", methods=["GET"])
+def mq_stats():
+    return jsonify(mq_store.stats())
+
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5050, debug=False, threaded=True)
+    app.run(host="127.0.0.1", port=51314, debug=False, threaded=True)

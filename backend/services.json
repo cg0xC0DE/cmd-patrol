@@ -5,7 +5,9 @@
     "script_path": "C:\\workplace\\config\\nginx_restart.cmd",
     "cwd": "C:\\workplace\\config",
     "command": "cmd.exe /c \"C:\\workplace\\config\\nginx_restart.cmd\"",
-    "port": ""
+    "port": "",
+    "config_file": "C:\\nginx-1.28.1\\conf\\nginx.conf",
+    "pinned": true
   },
   {
     "id": "0a2b0b4d-7555-4418-b1ce-85fce515e57b",
@@ -13,7 +15,9 @@
     "script_path": "C:\\workplace\\config\\ngrok_start.cmd",
     "cwd": "C:\\workplace\\config",
     "command": "cmd.exe /c \"C:\\workplace\\config\\ngrok_start.cmd\"",
-    "port": "4040"
+    "port": "4040",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "78b3c498-3a87-405d-b123-ce390a77013f",
@@ -21,7 +25,9 @@
     "script_path": "C:\\workplace\\link2asr\\start_backend.cmd",
     "cwd": "C:\\workplace\\link2asr",
     "command": "cmd.exe /c \"C:\\workplace\\link2asr\\start_backend.cmd\"",
-    "port": "53123"
+    "port": "53123",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "53e91235-0d15-42bd-9cbd-4b5963ebe5a1",
@@ -29,7 +35,9 @@
     "script_path": "C:\\workplace\\link2asr\\start_frontend.cmd",
     "cwd": "C:\\workplace\\link2asr",
     "command": "cmd.exe /c \"C:\\workplace\\link2asr\\start_frontend.cmd\"",
-    "port": "53124"
+    "port": "53124",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "d5dd84a2-2813-46be-b3d0-6691f54f49f1",
@@ -37,7 +45,9 @@
     "script_path": "C:\\workplace\\paste-any\\start_backend.cmd",
     "cwd": "C:\\workplace\\paste-any",
     "command": "cmd.exe /c \"C:\\workplace\\paste-any\\start_backend.cmd\"",
-    "port": "54123"
+    "port": "54123",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "c5e7c307-165e-4d00-9dbc-ae35638c0f60",
@@ -45,7 +55,9 @@
     "script_path": "C:\\workplace\\paste-any\\start_frontend.cmd",
     "cwd": "C:\\workplace\\paste-any",
     "command": "cmd.exe /c \"C:\\workplace\\paste-any\\start_frontend.cmd\"",
-    "port": "54124"
+    "port": "54124",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "e123f135-d21f-4cf9-a690-9b3e527dc4e7",
@@ -53,7 +65,9 @@
     "script_path": "C:\\workplace\\civitai-downloader\\start_backend.cmd",
     "cwd": "C:\\workplace\\civitai-downloader",
     "command": "cmd.exe /c \"C:\\workplace\\civitai-downloader\\start_backend.cmd\"",
-    "port": "53133"
+    "port": "53133",
+    "config_file": "",
+    "pinned": true
   },
   {
     "id": "06c0d25f-42fa-4721-9d45-9e8bef2971e8",
@@ -61,7 +75,9 @@
     "script_path": "C:\\workplace\\civitai-downloader\\start_frontend.cmd",
     "cwd": "C:\\workplace\\civitai-downloader",
     "command": "cmd.exe /c \"C:\\workplace\\civitai-downloader\\start_frontend.cmd\"",
-    "port": "53134"
+    "port": "53134",
+    "config_file": "",
+    "pinned": true
   },
   {
     "id": "ecba8263-0601-4ea9-8cb2-c6af363878a5",
@@ -69,7 +85,9 @@
     "script_path": "C:\\workplace\\civitai-downloader\\start_comfyui_watchdog.cmd",
     "cwd": "C:\\workplace\\civitai-downloader",
     "command": "cmd.exe /c \"C:\\workplace\\civitai-downloader\\start_comfyui_watchdog.cmd\"",
-    "port": "8188"
+    "port": "8188",
+    "config_file": "",
+    "pinned": true
   },
   {
     "id": "ab284d91-f47d-4c89-a9fc-a6e5ac337132",
@@ -77,7 +95,9 @@
     "script_path": "C:\\workplace\\iconscout\\start_backend.cmd",
     "cwd": "C:\\workplace\\iconscout",
     "command": "cmd.exe /c \"C:\\workplace\\iconscout\\start_backend.cmd\"",
-    "port": "55123"
+    "port": "55123",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "7a29f976-f2b0-4566-a410-097e14cdc547",
@@ -85,7 +105,9 @@
     "script_path": "C:\\workplace\\iconscout\\start_frontend.cmd",
     "cwd": "C:\\workplace\\iconscout",
     "command": "cmd.exe /c \"C:\\workplace\\iconscout\\start_frontend.cmd\"",
-    "port": "55124"
+    "port": "55124",
+    "config_file": "",
+    "pinned": false
   },
   {
     "id": "13d10ba2-9d05-4f09-88cd-28da55197844",
@@ -93,6 +115,8 @@
     "script_path": "C:\\workplace\\config\\openclaw_start.bat",
     "cwd": "C:\\workplace\\config",
     "command": "cmd.exe /c \"C:\\workplace\\config\\openclaw_start.bat\"",
-    "port": "10020"
+    "port": "10020",
+    "config_file": "",
+    "pinned": true
   }
 ]

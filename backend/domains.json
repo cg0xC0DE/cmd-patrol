@@ -6,23 +6,29 @@
     "https://dentiled-gennie-stichometrical.ngrok-free.dev"
   ],
   "targets": {
-    "link2asr": {
-      "type": "js_config",
-      "file": "C:/workplace/link2asr/frontend/config.js",
-      "key": "window.APP_CONFIG.apiBase",
-      "suffix": "/link2asr-service"
-    },
-    "paste-any": {
-      "type": "js_config",
-      "file": "C:/workplace/paste-any/frontend/config.js",
-      "key": "window.APP_CONFIG.apiBase",
-      "suffix": "/paste-service/api"
-    },
     "cg0x-site": {
-      "type": "json",
       "file": "C:/workplace/cg0x-site/public/active-domain.json",
       "jsonPath": "active",
-      "suffix": ""
+      "suffix": "",
+      "type": "json"
+    },
+    "iconscout": {
+      "file": "C:/workplace/iconscout/frontend/config.js",
+      "key": "window.APP_CONFIG.apiBase",
+      "suffix": "/iconscout-service",
+      "type": "js_config"
+    },
+    "link2asr": {
+      "file": "C:/workplace/link2asr/frontend/config.js",
+      "key": "window.APP_CONFIG.apiBase",
+      "suffix": "/link2asr-service",
+      "type": "js_config"
+    },
+    "paste-any": {
+      "file": "C:/workplace/paste-any/frontend/config.js",
+      "key": "window.APP_CONFIG.apiBase",
+      "suffix": "/paste-service/api",
+      "type": "js_config"
     }
   }
 }

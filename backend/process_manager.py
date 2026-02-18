@@ -38,13 +38,15 @@ def _extract_port(script_path: str) -> str:
 
 
 class ManagedProcess:
-    def __init__(self, id: str, name: str, script_path: str, cwd: str, command: str, port: str = ""):
+    def __init__(self, id: str, name: str, script_path: str, cwd: str, command: str, port: str = "", config_file: str = "", pinned: bool = False):
         self.id = id
         self.name = name
         self.script_path = script_path
         self.cwd = cwd
         self.command = command
         self.port = port
+        self.config_file = config_file
+        self.pinned = pinned
         self.process: subprocess.Popen = None
         self.log_buffer: list[str] = []
         self.subscribers: list = []
@@ -85,17 +87,36 @@ class ManagedProcess:
 
     def _read_output(self):
         try:
+            fd = self.process.stdout.fileno()
             buf = b''
             while True:
-                chunk = self.process.stdout.read(1)
+                try:
+                    chunk = os.read(fd, 8192)
+                except OSError:
+                    break
                 if not chunk:
                     if buf:
                         self._emit_line(buf)
                     break
                 buf += chunk
-                if chunk == b'\n':
-                    self._emit_line(buf)
-                    buf = b''
+                while True:
+                    idx_n = buf.find(b'\n')
+                    idx_r = buf.find(b'\r')
+                    if idx_n == -1 and idx_r == -1:
+                        break
+                    if idx_n == -1:
+                        idx = idx_r
+                    elif idx_r == -1:
+                        idx = idx_n
+                    else:
+                        idx = min(idx_n, idx_r)
+                    line = buf[:idx]
+                    if idx == idx_r and idx + 1 < len(buf) and buf[idx + 1:idx + 2] == b'\n':
+                        buf = buf[idx + 2:]
+                    else:
+                        buf = buf[idx + 1:]
+                    if line:
+                        self._emit_line(line)
         except:
             pass
         finally:
@@ -156,6 +177,8 @@ class ManagedProcess:
             "cwd": self.cwd,
             "command": self.command,
             "port": self.port,
+            "config_file": self.config_file,
+            "pinned": self.pinned,
             "status": self.status,
             "pid": self.pid,
             "started_at": self.started_at,
@@ -171,6 +194,8 @@ class ManagedProcess:
             "cwd": self.cwd,
             "command": self.command,
             "port": self.port,
+            "config_file": self.config_file,
+            "pinned": self.pinned,
         }
 
 
@@ -191,6 +216,8 @@ class ProcessManager:
                         cwd=item["cwd"],
                         command=item["command"],
                         port=item.get("port", ""),
+                        config_file=item.get("config_file", ""),
+                        pinned=item.get("pinned", False),
                     )
                     if not proc.port:
                         proc.port = _extract_port(proc.script_path)
