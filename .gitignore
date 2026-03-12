@@ -16,6 +16,11 @@ backend/.venv/
 .vscode/
 .idea/
 
+# Runtime data (machine-specific, may contain secrets)
+backend/services.json
+backend/mq.json
+backend/domains.json
+
 # OS
 .DS_Store
 Thumbs.db

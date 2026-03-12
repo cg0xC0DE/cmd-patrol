@@ -27,6 +27,9 @@ rem --- Set global env var so other projects can discover the MQ endpoint ---
 set "CMD_PATROL_URL=http://127.0.0.1:51314"
 setx CMD_PATROL_URL "%CMD_PATROL_URL%" >nul 2>&1
 
-echo [cmd-patrol] Starting server on %CMD_PATROL_URL%
-start "" "%CMD_PATROL_URL%"
-"%UV%" run python app.py
+rem --- Kill leftover zombies from previous session ---
+taskkill /F /IM python.exe >nul 2>&1
+taskkill /F /IM node.exe >nul 2>&1
+
+echo [cmd-patrol] Starting system tray on %CMD_PATROL_URL%
+"%UV%" run python tray.py

@@ -1,5 +1,6 @@
 import json
 import re
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -17,10 +18,22 @@ def _read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _migrate_candidates(candidates: list) -> list[dict[str, str]]:
+    result = []
+    for c in candidates:
+        if isinstance(c, str):
+            result.append({"url": c.strip(), "ngrok_cmd": ""})
+        elif isinstance(c, dict):
+            result.append({"url": str(c.get("url", "")).strip(), "ngrok_cmd": str(c.get("ngrok_cmd", "")).strip()})
+    return [r for r in result if r["url"]]
+
+
 def load_domains() -> dict[str, Any]:
     if not DOMAINS_FILE.exists():
         return {"active": "", "candidates": [], "targets": {}}
-    return _read_json(DOMAINS_FILE)
+    data = _read_json(DOMAINS_FILE)
+    data["candidates"] = _migrate_candidates(data.get("candidates", []))
+    return data
 
 
 def save_domains(data: dict[str, Any]) -> None:
@@ -75,6 +88,44 @@ def _apply_json(target_file: Path, json_path: str, suffix: str, domain: str) -> 
     return ApplyResult(True, f"Updated {target_file}")
 
 
+def _find_git_root(file_path: Path) -> Path | None:
+    cur = file_path.parent if file_path.is_file() else file_path
+    while cur != cur.parent:
+        if (cur / ".git").exists():
+            return cur
+        cur = cur.parent
+    return None
+
+
+def _git_commit_push(file_path: Path, commit_msg: str) -> str:
+    git_root = _find_git_root(file_path)
+    if not git_root:
+        return "git root not found"
+    try:
+        rel = file_path.relative_to(git_root).as_posix()
+        subprocess.run(["git", "add", rel], cwd=str(git_root), capture_output=True, timeout=10)
+        result = subprocess.run(
+            ["git", "commit", "-m", commit_msg],
+            cwd=str(git_root), capture_output=True, text=True, timeout=15
+        )
+        if result.returncode != 0:
+            out = (result.stdout + result.stderr).strip()
+            if "nothing to commit" in out:
+                return "no changes to commit"
+            return f"commit failed: {out}"
+        push = subprocess.run(
+            ["git", "push", "origin", "main"],
+            cwd=str(git_root), capture_output=True, text=True, timeout=30
+        )
+        if push.returncode != 0:
+            return f"committed but push failed: {(push.stdout + push.stderr).strip()}"
+        return "committed & pushed"
+    except subprocess.TimeoutExpired:
+        return "git operation timed out"
+    except Exception as e:
+        return f"git error: {e}"
+
+
 def apply_active_domain(active_domain: str) -> list[dict[str, Any]]:
     cfg = load_domains()
     targets = cfg.get("targets", {})
@@ -98,6 +149,16 @@ def apply_active_domain(active_domain: str) -> list[dict[str, Any]]:
         else:
             r = ApplyResult(False, f"Unknown target type: {t_type}")
 
-        results.append({"target": name, "ok": r.ok, "message": r.message})
+        git_msg = ""
+        if r.ok and t.get("auto_commit"):
+            commit_msg = t.get("commit_msg") or "change domain"
+            git_msg = _git_commit_push(path, commit_msg)
+
+        results.append({
+            "target": name,
+            "ok": r.ok,
+            "message": r.message,
+            "git": git_msg
+        })
 
     return results
